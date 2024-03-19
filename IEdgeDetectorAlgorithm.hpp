@@ -1,9 +1,8 @@
-#pragma once 
+#pragma once
 #include <cstdint>
-
+#include <vector>
 class IEdgeDetectorAlgorithm
 {
 public:
-    virtual void process(uint8_t* image, uint8_t* detectedEged) = 0;
+    virtual std::vector<std::vector<double>> process(const std::vector<std::vector<uint8_t>> &image) = 0;
 };
-
