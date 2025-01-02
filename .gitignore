@@ -1,4 +1,5 @@
 main
 external/*
 resources/*png
+*bmp
 .vscode/
