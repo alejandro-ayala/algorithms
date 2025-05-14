@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "C/C++: Compilar todo el proyecto con g++",
+            "type": "shell",
+            "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
+            "args": [
+                "-g",
+                "D:\\Code\\algorithms\\main.cpp",
+                "D:\\Code\\algorithms\\ImageScaler.cpp",
+                "-o",
+                "D:\\Code\\algorithms\\main.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Compila todo el proyecto con g++ incluyendo main.cpp e ImageScaler.cpp"
+        }
+    ]
+}
