@@ -1,8 +1,11 @@
 import os
 
 # Verificar si el directorio existe
-input_folder = "D:/Code/algorithms/Resources/imageSamples/out"
-output_folder = "D:/Code/algorithms/Resources/imageSamples/out"
+#input_folder = "D:/Code/algorithms/Resources/imageSamples/out"
+#Soutput_folder = "D:/Code/algorithms/Resources/imageSamples/out"
+input_folder = "C:/Users/aayal/Documents/Code/algorithms/Resources/imageSamples/out"
+output_folder = "C:/Users/aayal/Documents/Code/algorithms/Resources/imageSamples/out"
+
 if not os.path.exists(input_folder):
     print(f"Error: El directorio {input_folder} no existe.")
 else:

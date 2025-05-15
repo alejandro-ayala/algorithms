@@ -41,7 +41,7 @@ int main()
 #include <iostream>
 #include <filesystem>
 #include <string>
-#include "ImageScaler.h"
+#include "ImageClassifier/ImageScaler.h"
 
 namespace fs = std::filesystem;
 
@@ -61,7 +61,7 @@ int main() {
                 std::cout << "Processing: " << path.string() << std::endl;
 
                 int width, height, channels;
-                auto input_image = imgScaler.loadImage(path.string(), width, height, channels);
+                auto input_image = imgScaler.loadImage(path.string());
 
                 if (!input_image) {
                     std::cerr << "Failed to load image: " << path.string() << std::endl;
@@ -69,16 +69,15 @@ int main() {
                 }
 
                 // Convert to gray
-                unsigned char* gray_image = new unsigned char[width * height];
-                imgScaler.rgb2Gray(input_image, gray_image, width, height);
+                imgScaler.rgb2Gray();
 
                 // Scale
                 unsigned char* output_gray = new unsigned char[target_width * target_height];
-                imgScaler.scaleBilinear(gray_image, output_gray, width, height, target_width, target_height);
+                imgScaler.scaleBilinear(target_width, target_height);
 
                 // Output file name
 				std::string output_filename = output_folder + "/" + path.stem().string() + "_gray_" + std::to_string(target_width) + "x" + std::to_string(target_height) + ".raw";
-                imgScaler.saveImage(output_filename, output_gray, target_width * target_height);
+                imgScaler.saveImage(output_filename);
 
                 std::cout << "Saved: " << output_filename << std::endl;
 /*

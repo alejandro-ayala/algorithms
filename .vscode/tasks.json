@@ -4,13 +4,14 @@
         {
             "label": "C/C++: Compilar todo el proyecto con g++",
             "type": "shell",
-            "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
+            //"command": "C:\\msys64\\mingw64\\bin\\g++.exe",
+            "command": "g++.exe",
             "args": [
                 "-g",
-                "D:\\Code\\algorithms\\main.cpp",
-                "D:\\Code\\algorithms\\ImageScaler.cpp",
+                "C:\\Users\\aayal\\Documents\\Code\\algorithms\\main.cpp",
+                "C:\\Users\\aayal\\Documents\\Code\\algorithms\\ImageClassifier\\ImageScaler.cpp",
                 "-o",
-                "D:\\Code\\algorithms\\main.exe"
+                "C:\\Users\\aayal\\Documents\\Code\\algorithms\\main.exe"
             ],
             "group": {
                 "kind": "build",
