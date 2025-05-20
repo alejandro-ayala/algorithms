@@ -1,4 +1,6 @@
 
+#define IMAGE3D_PROJECTOR
+
 #include <string>
 #include <iostream>
 #ifdef IMAGE3D_PROJECTOR
@@ -6,34 +8,48 @@
 
 
 #include <cmath>
-#include "ImageWriter.h"
-#include "ImageReader.h"
-#include "Image3DProjector.h"
+#include "Image3DProjector/ImageWriter.h"
+#include "Image3DProjector/ImageReader.h"
+#include "Image3DProjector/Image3DProjector.h"
 
 int main()
 {
 	std::cout << "Starting the program" << std::endl;
 
-	const auto lidarData = ImageReader().readLidarData();
+	const auto lidarData = ImageReader().readLidarData("imageSamples/lidarSampleGarminV3.txt");
 
 	auto image3dProjector = Image3DProjector();
 	const auto projectedPoints = image3dProjector.project3DImageTo2D(lidarData);
 	
-	uint16_t width = 1240, height = 380;
+	//uint16_t width = 1240, height = 380;
+    uint16_t width = 320, height = 240;
 	ImageWriter(width, height, "output.bmp").createBMPImage(projectedPoints);
 	std::cout << "createBMPImage done" << std::endl;	
 
 	
 	std::vector<std::vector<float>> projectedImg;
+    bool cartesianPoint = true;
 	for(const auto& point : lidarData)
 	{
-		
-		Coordinate3DPoint lidarPoint(point[0], point[1], point[2]);
-		const auto projectedPoint = image3dProjector.project3DPointTo2D(lidarPoint);
-		std::vector<float> projectedPointVector{projectedPoint.x, projectedPoint.y, projectedPoint.z};
-		projectedImg.push_back(projectedPointVector);
+        if(cartesianPoint)
+        {
+            auto cartesianLidarPoint = CartesianLidarPoint(point[2], point[0], point[1]);
+            Coordinate3DPoint lidarPoint(cartesianLidarPoint.xCoord, cartesianLidarPoint.yCoord, cartesianLidarPoint.zCoord); 
+            const auto projectedPoint = image3dProjector.project3DPointTo2D(lidarPoint);
+            std::vector<float> projectedPointVector{projectedPoint.x, projectedPoint.y, projectedPoint.z};
+            projectedImg.push_back(projectedPointVector);
+        }
+        else
+        {
+            Coordinate3DPoint lidarPoint(point[0], point[1], point[2]);
+            const auto projectedPoint = image3dProjector.project3DPointTo2D(lidarPoint);
+            std::vector<float> projectedPointVector{projectedPoint.x, projectedPoint.y, projectedPoint.z};
+            projectedImg.push_back(projectedPointVector);
+            
+        }
+
 	}
-	ImageWriter(width, height, "output2.bmp").createBMPImage(projectedPoints);
+    ImageWriter(width, height, "output3d.bmp").createBMPImage(projectedImg);
     return 0;
 }
 
@@ -51,7 +67,7 @@ int main() {
 	fs::create_directories(output_folder);
     const int target_width = 96;
     const int target_height = 96;
-
+    std::cout << "Starting programm" << std::endl;
     ImageScaler imgScaler;
 
     for (const auto& entry : fs::directory_iterator(input_folder)) {

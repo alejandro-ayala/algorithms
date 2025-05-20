@@ -13,5 +13,5 @@ private:
 public:
     ImageReader() = default;
     ~ImageReader() = default;
-    std::vector<std::vector<float>> readLidarData();
+    std::vector<std::vector<float>> readLidarData(std::string fileName = "imageSamples/lidarSample.txt");
 };

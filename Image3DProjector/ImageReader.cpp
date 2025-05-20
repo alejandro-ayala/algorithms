@@ -1,10 +1,10 @@
 #include "ImageReader.h"
 
-std::vector<std::vector<float>> ImageReader::readLidarData()
+std::vector<std::vector<float>> ImageReader::readLidarData(std::string fileName)
 {
     // Create an input file stream object named 'file' and
     // open the file "GFG.txt".
-    std::ifstream file("imageSamples/lidarSample.txt");
+    std::ifstream file(fileName);
 	std::vector<std::vector<float>> lidarData;
     // String to store each line of the file.
     std::string line;

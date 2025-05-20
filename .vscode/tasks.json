@@ -1,26 +1,21 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "C/C++: Compilar todo el proyecto con g++",
-            "type": "shell",
-            //"command": "C:\\msys64\\mingw64\\bin\\g++.exe",
-            "command": "g++.exe",
-            "args": [
-                "-g",
-                "C:\\Users\\aayal\\Documents\\Code\\algorithms\\main.cpp",
-                "C:\\Users\\aayal\\Documents\\Code\\algorithms\\ImageClassifier\\ImageScaler.cpp",
-                "-o",
-                "C:\\Users\\aayal\\Documents\\Code\\algorithms\\main.exe"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "detail": "Compila todo el proyecto con g++ incluyendo main.cpp e ImageScaler.cpp"
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-all-cpp",
+      "type": "shell",
+      "command": "C:\\Program Files\\Git\\bin\\bash.exe" ,  
+      "args": [
+        "-c",
+        "g++ -g main.cpp ImageClassifier/*.cpp Image3DProjector/*.cpp -o main.exe"      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
 }
