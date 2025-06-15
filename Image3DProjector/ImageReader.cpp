@@ -1,5 +1,35 @@
 #include "ImageReader.h"
 
+#include <fstream>
+#include <vector>
+#include <iostream>
+
+std::vector<std::vector<float>> ImageReader::readLidarData(const std::string& fileName) {
+    std::ifstream file(fileName, std::ios::binary); // modo binario
+
+    std::vector<std::vector<float>> lidarData;
+
+    if (!file) {
+        std::cerr << "Unable to open file: " << fileName << std::endl;
+        return lidarData;
+    }
+
+    // Leer el archivo completo en bloques de 4 floats
+    float point[4];
+    while (file.read(reinterpret_cast<char*>(point), sizeof(point))) {
+
+        std::cout << "Point: x=" << point[0]
+                  << ", y=" << point[1]
+                  << ", z=" << point[2]
+                  << ", r=" << point[3] << std::endl;
+        lidarData.push_back({point[0], point[1], point[2], point[3]});
+    }
+
+    std::cout << "Read " << lidarData.size() << " LIDAR points from " << fileName << std::endl;
+    return lidarData;
+}
+
+/*
 std::vector<std::vector<float>> ImageReader::readLidarData(std::string fileName)
 {
     // Create an input file stream object named 'file' and
@@ -39,3 +69,5 @@ std::vector<std::vector<float>> ImageReader::readLidarData(std::string fileName)
 	std::cout << "Readed Lidar sample size: " << lidarData.size() << std::endl;
 	return lidarData;
 }
+
+*/
