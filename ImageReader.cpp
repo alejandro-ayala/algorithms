@@ -1,39 +1,62 @@
 #include "ImageReader.h"
 
-std::vector<std::vector<float>> ImageReader::readLidarData()
+std::vector<std::vector<float>> ImageReader::readLidarData(std::string filename)
 {
     // Create an input file stream object named 'file' and
     // open the file "GFG.txt".
-    std::ifstream file("imageSamples/lidarSample.txt");
+    bool isBinaryFile = false;
+    if(endsWith(filename, ".bin"))
+    {
+        std::ifstream file(filename, std::ios::binary);
+        isBinaryFile = true;
+    }
+
 	std::vector<std::vector<float>> lidarData;
-    // String to store each line of the file.
     std::string line;
-
-    if (file.is_open()) {
-        // Read each line from the file and store it in the
-        // 'line' variable.
-        while (std::getline(file, line)) {
-            //std::cout << line << std::endl;
-			std::stringstream ss(line);
-			std::string s;
-			std::vector<float>v;
-			while (std::getline(ss, s, ' ')) 
-			{
-				float num = std::stof(s);
-				//std::cout << "value: " << num << std::endl;
-				v.push_back(num);
-			}
-			lidarData.push_back(v);		
+    if(isBinaryFile)
+    {
+        std::ifstream file(filename, std::ios::binary);
+    
+        if (!file) {
+            std::cerr << "Unable to open file!" << std::endl;
+            return std::vector<std::vector<float>>();
         }
-
-        // Close the file stream once all lines have been
-        // read.
+    
+        char byte;
+    
+    LidarPoint lidarPoint;
+    
+    while (file.read(reinterpret_cast<char*>(&lidarPoint), sizeof(LidarPoint))) 
+    {
+        //std::cout << "X: " << lidarPoint.x << ", Y: " << lidarPoint.y << ", Z: " << lidarPoint.z << std::endl;
+        std::vector<float>lidarPointVector{lidarPoint.x, lidarPoint.y, lidarPoint.z};
+        lidarData.push_back(lidarPointVector);
+    }
+        
+        //std::cout << std::dec << std::endl; // Vuelve a formato decimal
         file.close();
     }
-    else {
-        // Print an error message to the standard error
-        // stream if the file cannot be opened.
-        std::cerr << "Unable to open file!" << std::endl;
+    else
+    {
+        std::ifstream file(filename);
+        if (file.is_open()) {
+            while (std::getline(file, line)) {
+                std::stringstream ss(line);
+                std::string s;
+                std::vector<float>v;
+                while (std::getline(ss, s, ' ')) 
+                {
+                    float num = std::stof(s);
+                    v.push_back(num);
+                }
+                lidarData.push_back(v);		
+            }
+            file.close();
+        }
+        else {
+            std::cerr << "Unable to open file!" << std::endl;
+        }        
+
     }
 
 	std::cout << "Readed Lidar sample size: " << lidarData.size() << std::endl;

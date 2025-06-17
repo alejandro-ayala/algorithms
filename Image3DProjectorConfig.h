@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <vector>
+#ifdef VELODYNE_DATA
 struct Image3DProjectorConfig
 {
 	const float m_focalLenX = 718.856;
@@ -19,3 +20,24 @@ struct Image3DProjectorConfig
 		{{0.0, 0.0, 0.0, 1.0}}
 	}};
 };
+
+#else 
+struct Image3DProjectorConfig
+{
+	const float m_focalLenX = 1.53456643e+03;
+	const float m_opticalCenterX =  1.61379545e+02;
+	const float m_focalLenY = 2.25604021e+03;
+	const float m_opticalCenterY = 1.22459554e+02;
+	const std::vector<std::vector<float>> m_cameraIntrinsicMatrix{{
+	    {{m_focalLenX, 0.0, m_opticalCenterX, 0.0}},
+	    {{0.0, m_focalLenY, m_opticalCenterY, 0.0}},
+	    {{0.0, 0.0, 1.0, 0.0}}
+	}};
+	const std::vector<std::vector<float>> m_cameraExtrinsicMatrix{{
+	    {{0.0, 0.0, 1.0, 0.0}},
+	    {{1.0, 0.0, 0.0, 0.0}},
+	    {{0.0, -1.0, 0.0, 0.0}},
+		{{0.0, 0.0, 0.0, 1.0}}
+	}};
+};
+#endif

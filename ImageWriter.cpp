@@ -5,8 +5,8 @@ ImageWriter::ImageWriter(uint16_t width, uint16_t height, const std::string& fil
 
 Color ImageWriter::getColor(float distance) 
 {
-    if (distance < 50) return {255, 0, 0}; // R
-    else if (distance < 100) return {0, 255, 0}; //G
+    if (distance < 20) return {255, 0, 0}; // R
+    else if (distance < 50) return {0, 255, 0}; //G
     else return {0, 0, 255}; //B
 }
 
@@ -19,10 +19,12 @@ void ImageWriter::createBMPImage(const std::vector<std::vector<float>>& points)
         int x = static_cast<int>(point[0]);
         int y = static_cast<int>(point[1]);
         float distance = point[2];
-
+        std::cout << "x: " << x << ", y: " << y << " distance: " << distance << std::endl;
         if (x >= 0 && x < m_width && y >= 0 && y < m_height) {
             image[y * m_width + x] = getColor(distance);
         }
+        else
+            std::cout << "Discarded " << std::endl;
     }
 
     writeBMP(m_filename, m_width, m_height, image);
