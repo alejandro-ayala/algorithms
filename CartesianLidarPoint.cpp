@@ -3,10 +3,12 @@
 
 CartesianLidarPoint::CartesianLidarPoint(uint16_t distance, uint8_t angleH, uint8_t angleV)
 {
+    double theta = angleH * PI / 180.0; // azimut en radianes
+    double phi = angleV * PI / 180.0;   // elevación en radianes
 
-    xCoord = distance * std::sin(angleV * PI / 180) * std::cos(angleH * PI / 180);
-    yCoord = distance * std::sin(angleV) * std::sin(angleH * PI / 180);
-    zCoord = distance * std::cos(angleV * PI / 180);
+    xCoord = distance * std::cos(phi) * std::cos(theta);
+    yCoord = distance * std::cos(phi) * std::sin(theta);
+    zCoord = distance * std::sin(phi);
 }
 
 bool CartesianLidarPoint::operator==(const CartesianLidarPoint& other) const

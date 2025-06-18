@@ -3,26 +3,12 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "C/C++: g++.exe build all files",
-            "command": "C:\\Strawberry\\c\\bin\\g++.exe",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-g",
-                "${workspaceFolder}/*.cpp",
-                "-o",
-                "${workspaceFolder}/Image3DProjector.exe"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
+            "label": "Depurar proyecto C++",
+            "command": "g++ -g -std=c++17 -o main_debug.exe main.cpp CartesianLidarPoint.cpp Coordinate3DPoint.cpp Image3DProjector.cpp ImageReader.cpp ImageWriter.cpp",
+            "group": "build",
             "problemMatcher": [
                 "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "detail": "compiler: C:\\Strawberry\\c\\bin\\g++.exe"
+            ]
         }
     ]
 }
