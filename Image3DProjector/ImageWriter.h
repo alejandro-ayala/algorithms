@@ -19,11 +19,11 @@ private:
     uint16_t m_height;
     uint16_t m_width;
     std::string m_filename;
-    Color getColor(float distance);
+    Color getColor(float distance, float maxDist);
     void writeBMP(const std::string& filename, int width, int height, const std::vector<Color>& image);
 
 public:
     ImageWriter(uint16_t width, uint16_t height, const std::string& fileName);
     ~ImageWriter() = default;
-    void createBMPImage(const std::vector<std::vector<float>>& points);
+    void createBMPImage(const std::vector<std::vector<float>>& points, float maxDistance);
 };

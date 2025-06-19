@@ -16,18 +16,23 @@ int main()
 {
 	std::cout << "Starting the program" << std::endl;
 
-    const std::string inputFileName =  "C:\\Users\\aayal\\Documents\\Code\\algorithms\\Image3DProjector\\2011_09_26\\2011_09_26_drive_0001_sync\\velodyne_points\\data\\0000000036.bin";
+    //const std::string inputFileName =  "D:\\Code\\algorithms\\Resources\\000007.bin";
+    //const std::string inputFileName =  "D:\\Code\\algorithms\\Resources\\0000000107.bin";
+    //const std::string inputFileName =  "D:\\Code\\algorithms\\Resources\\0000000001.bin";
+    float maxDistance = 0.0;
+	//const auto lidarData = ImageReader().readLidarData(inputFileName, maxDistance);
+    const std::string inputFileName =  "Scripts\\LidarSample_1.txt";
+
 	const auto lidarData = ImageReader().readLidarData();
-	for(const auto& point : lidarData)
-	{
-		std::cout << "Lidar point: " << point[0] << ", " << point[1] << ", " << point[2] << std::endl;
-	}
+
+    std::cout << "maxDistance: " << std::to_string(maxDistance) << std::endl;
+
 	auto image3dProjector = Image3DProjector();
 	const auto projectedPoints = image3dProjector.project3DImageTo2D(lidarData);
 	
 	uint16_t width = 1240, height = 380;
     //uint16_t width = 320, height = 240;
-	ImageWriter(width, height, "output.bmp").createBMPImage(projectedPoints);
+	ImageWriter(width, height, "output.bmp").createBMPImage(projectedPoints, maxDistance);
 	std::cout << "createBMPImage done" << std::endl;	
 /*	
 	std::vector<std::vector<float>> projectedImg;

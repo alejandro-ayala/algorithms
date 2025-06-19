@@ -1,19 +1,45 @@
 #include "ImageWriter.h"
+#include <cmath>
+#include <algorithm>
 
 ImageWriter::ImageWriter(uint16_t width, uint16_t height, const std::string& fileName) : m_width(width), m_height(height), m_filename(fileName)
 {}
 
-Color ImageWriter::getColor(float distance) 
-{
-    if (distance < 50) return {255, 0, 0}; // R
-    else if (distance < 100) return {0, 255, 0}; //G
-    else return {0, 0, 255}; //B
+#include <cmath>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+Color ImageWriter::getColor(float distance, float maxDist) {
+    float norm = distance / maxDist;
+    if (norm > 1.0f) norm = 1.0f;
+    if (norm < 0.0f) norm = 0.0f;
+
+    // rainbow_r colormap approx (invertido)
+    float r = std::sin(M_PI * 0.8f * (1.0f - norm));
+    float g = std::sin(M_PI * 0.8f * (1.0f - norm + 0.33f));
+    float b = std::sin(M_PI * 0.8f * (1.0f - norm + 0.66f));
+
+    auto clamp255 = [](float v) -> uint8_t {
+        v = v * v; // potenciar para saturar colores
+        float val = v * 255.0f;
+        if (val < 0.0f) val = 0.0f;
+        if (val > 255.0f) val = 255.0f;
+        return static_cast<uint8_t>(val);
+    };
+
+    return {
+        clamp255(r),
+        clamp255(g),
+        clamp255(b)
+    };
 }
 
-void ImageWriter::createBMPImage(const std::vector<std::vector<float>>& points) 
+
+void ImageWriter::createBMPImage(const std::vector<std::vector<float>>& points, float maxDistance) 
 {
     std::cout << "createBMPImage: " << m_filename << std::endl;
-    std::vector<Color> image(m_width * m_height, {0, 0, 0}); // Inicializar con negro
+    std::vector<Color> image(m_width * m_height, {0, 0, 0}); 
 
     for (const auto& point : points) {
         int x = static_cast<int>(point[0]);
@@ -21,7 +47,7 @@ void ImageWriter::createBMPImage(const std::vector<std::vector<float>>& points)
         float distance = point[2];
 
         if (x >= 0 && x < m_width && y >= 0 && y < m_height) {
-            image[y * m_width + x] = getColor(distance);
+            image[y * m_width + x] = getColor(distance, maxDistance);
         }
     }
 

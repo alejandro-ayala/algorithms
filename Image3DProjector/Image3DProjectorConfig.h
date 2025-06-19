@@ -3,6 +3,7 @@
 #include <vector>
 struct Image3DProjectorConfig
 {
+#ifdef VELODYNE_DATA
 	const float m_focalLenX = 718.856;
 	const float m_opticalCenterX = 607.1928;
 	const float m_focalLenY = 718.856;
@@ -18,4 +19,21 @@ struct Image3DProjectorConfig
 	    {{0.9999644, 0.007969825, -0.002764397, -0.2918589}},
 		{{0.0, 0.0, 0.0, 1.0}}
 	}};
+#else
+	const float m_focalLenX = 367.61993872;
+	const float m_opticalCenterX = 165.23052156;
+	const float m_focalLenY = 365.71696573;
+	const float m_opticalCenterY = 185.2157;
+	const std::vector<std::vector<float>> m_cameraIntrinsicMatrix{{
+	    {{m_focalLenX, 0.0, m_opticalCenterX, 0}},
+	    {{0.0, m_focalLenY, 116.66181125, 0}},
+	    {{0.0, 0.0, 1.0, 0}}
+	}};
+	const std::vector<std::vector<float>> m_cameraExtrinsicMatrix{{
+	    {{0.0, 0.0, 1.0, 0.0}},
+	    {{1.0, 0.0, 0.0, 0.0}},
+	    {{0.0, -1.0, 0.0, 0.0}},
+		{{0.0, 0.0, 0.0, 1.0}}
+	}};
+#endif
 };

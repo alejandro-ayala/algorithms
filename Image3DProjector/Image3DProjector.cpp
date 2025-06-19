@@ -58,8 +58,13 @@ std::vector<std::vector<float>> Image3DProjector::project3DImageTo2D(const std::
 		std::cout << "Projecting lidar data to camera plane" << std::endl;
 		for (auto sample : image3d)
 		{
+			auto cartesianPoint = CartesianLidarPoint{static_cast<uint16_t>(sample[2]), static_cast<uint8_t>(sample[0]), static_cast<uint8_t>(sample[1])};
+			std::cout << " SphericalPoint (" << sample[2] << "," << sample[0] << "," << sample[1] << ")" << std::endl;
+			std::cout << " cartesianPoint (" << cartesianPoint.xCoord << "," << cartesianPoint.yCoord << "," << cartesianPoint.zCoord << ")" << std::endl;
 
-			const std::vector<std::vector<float>> sampleLidarPoint{{{{sample[0]}}, {{sample[1]}}, {{sample[2]}}, {{1.0}} }};
+			//const std::vector<std::vector<float>> sampleLidarPoint{{{{sample[0]}}, {{sample[1]}}, {{sample[2]}}, {{1.0}} }};
+			const std::vector<std::vector<float>> sampleLidarPoint{{{{cartesianPoint.xCoord}}, {{cartesianPoint.yCoord}}, {{cartesianPoint.zCoord}}, {{1.0}} }};
+
 			auto projectedPoint = multiplyMatrix(t_projection, sampleLidarPoint);
 			projectedPoints.push_back(std::vector<float>{projectedPoint[0][0] / projectedPoint[2][0], projectedPoint[1][0] / projectedPoint[2][0], projectedPoint[2][0]});
 		}
