@@ -51,80 +51,22 @@ Coordinate3DPoint Image3DProjector::project3DPointTo2D(const Coordinate3DPoint& 
 
 std::vector<std::vector<float>> Image3DProjector::project3DImageTo2D(const std::vector<std::vector<float>>& image3d)
 {
-	std::vector<std::vector<float>> projectedPoints;
-	try
-	{
-		std::cout << "Projecting lidar data to camera plane" << std::endl;
-		for (auto sample : image3d)
-		{
-
+    std::vector<std::vector<float>> projectedImg;
+	for(const auto& point : image3d)
+	{        
 #ifdef VELODYNE_DATA
-			CartesianLidarPoint cartesianPoint;
-			cartesianPoint.xCoord = static_cast<uint16_t>(sample[0]);
-			cartesianPoint.yCoord = static_cast<uint8_t>(sample[1]);
-			cartesianPoint.zCoord = static_cast<uint8_t>(sample[2]);
+
+            Coordinate3DPoint lidarPoint(point[0], point[1], point[2]);
+            const auto projectedPoint = project3DPointTo2D(lidarPoint);
+            std::vector<float> projectedPointVector{projectedPoint.x, projectedPoint.y, projectedPoint.z};
+            projectedImg.push_back(projectedPointVector);
 #else
-			auto cartesianPoint = CartesianLidarPoint{sample[2] / 100, sample[0], sample[1]};
-			std::cout << " SphericalPoint (" << sample[2] << "," << sample[0] << "," << sample[1] << ")" << std::endl;
-			std::cout << " cartesianPoint (" << cartesianPoint.xCoord << "," << cartesianPoint.yCoord << "," << cartesianPoint.zCoord << ")" << std::endl;
-#endif
-			const std::vector<std::vector<float>> sampleLidarPointHomo = {
-				{cartesianPoint.xCoord},
-				{cartesianPoint.yCoord},
-				{cartesianPoint.zCoord},
-				{1.0f}
-			};
-			auto sampleLidar2CamPoint = multiplyMatrix(m_projectionConfig.m_cameraExtrinsicMatrix, sampleLidarPointHomo);
-
-			std::vector<std::vector<float>> sampleLidar2CamPoint3x1{
-				{sampleLidar2CamPoint[0][0]},
-				{sampleLidar2CamPoint[1][0]},
-				{sampleLidar2CamPoint[2][0]}
-			};
-			std::cout << " sampleLidar2CamPoint3x1 (" << sampleLidar2CamPoint[0][0] << "," << sampleLidar2CamPoint[1][0] << "," << sampleLidar2CamPoint[2][0] << ")" << std::endl;
-
-			auto sampleLidar2ImagePoint = multiplyMatrix(m_projectionConfig.m_cameraIntrinsicMatrix, sampleLidar2CamPoint3x1);
-			std::cout << " sampleLidar2ImagePoint (" << sampleLidar2ImagePoint[0][0] << "," << sampleLidar2ImagePoint[1][0] << "," << sampleLidar2ImagePoint[2][0] << ")" << std::endl;
-			float u = sampleLidar2ImagePoint[0][0] / sampleLidar2ImagePoint[2][0];
-			float v = sampleLidar2ImagePoint[1][0] / sampleLidar2ImagePoint[2][0];
-			float z = sampleLidar2ImagePoint[2][0];
-			std::cout << "Projected point (u,v,z): " << u << "," << v  << "," << z << std::endl;
-			bool discardPoint = false;
-			if (u < 0 || u >= cameraResolutionWidth)
-			{
-				std::cout << "U Point out of bounds: (" << u << "," << v << "," << z << ")" << std::endl;
-				discardPoint = true;
-				//continue; // Skip points that are out of bounds
-			}
-			if (v < 0 || v >= cameraResolutionHeight)
-			{
-				std::cout << " V Point out of bounds: (" << u << "," << v << "," << z << ")" << std::endl;
-				discardPoint = true;
-				//continue; // Skip points that are out of bounds
-			}
-			if (z < 0)
-			{
-				std::cout << "Negative depth value: (" << u << "," << v << "," << z << ")" << std::endl;
-				discardPoint = true;
-				//continue; // Skip points with negative depth
-			}
-			if(!discardPoint)
-			{
-				std::cout << "Projected point (u,v,z): " << u << "," << v  << "," << z << std::endl;
-				projectedPoints.push_back(std::vector<float>{u, v,z});
-			}
-			else
-			{
-				std::cout << "Discarded point: (" << u << "," << v << "," << z << ")" << std::endl;
-			}
-			
-			
-		}
+            auto cartesianLidarPoint = CartesianLidarPoint(point[2] / 100, point[0], point[1]);
+            Coordinate3DPoint lidarPoint(cartesianLidarPoint.xCoord, cartesianLidarPoint.yCoord, cartesianLidarPoint.zCoord); 
+            const auto projectedPoint = project3DPointTo2D(lidarPoint);
+            std::vector<float> projectedPointVector{projectedPoint.x, projectedPoint.y, projectedPoint.z};
+            projectedImg.push_back(projectedPointVector);
+ #endif
 	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
-
-	return projectedPoints;
+    return projectedImg;
 }

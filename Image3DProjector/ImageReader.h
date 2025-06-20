@@ -14,5 +14,5 @@ public:
     ImageReader() = default;
     ~ImageReader() = default;
     std::vector<std::vector<float>> readLidarData(const std::string& fileName, float& maxDist);
-    std::vector<std::vector<float>> readLidarData();
+    std::vector<std::vector<float>> readLidarDataFromTxtFile(const std::string& fileName);
 };
