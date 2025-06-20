@@ -3,9 +3,10 @@
 std::vector<std::vector<float>> Image3DProjector::multiplyMatrix(const std::vector<std::vector<float>>& a, const std::vector<std::vector<float>>& b) const
 {
 	//std::cout << "Multiply matrix: A: " << std::to_string(a.size())  << "x" << std::to_string(a.at(0).size()) << " and B:" << std::to_string(b.size()) << "x" << std::to_string(b.at(0).size()) << std::endl;
-	//BUSINESS_LOGIC_ASSERT((a.at(0).size() == b.size()), services::BusinessLogicErrorId::MatrixDimensionError, "Wrong matrix dimension. Can not be multiplied");
-	std::vector<std::vector<float>> result(a.size(), std::vector<float>(a.at(0).size()));
-	//std::cout << "a.size
+   // if (a.at(0).size() != b.size())
+     //   throw std::invalid_argument("Matrix dimensions do not allow multiplication");	
+	//BUSINESS_LOGIC_ASSERT((a.at(0).size() == b.size()), services::BusinessLogicErrorId::MatrixDimensionError, "Matrix dimensions do not allow multiplication");
+	std::vector<std::vector<float>> result(a.size(), std::vector<float>(b.at(0).size(), 0.0f));
 	for(size_t rowIdx = 0; rowIdx < a.size(); rowIdx++)
 	{
 		for(size_t columnIdx = 0; columnIdx < b.at(0).size(); columnIdx++)
@@ -50,23 +51,74 @@ Coordinate3DPoint Image3DProjector::project3DPointTo2D(const Coordinate3DPoint& 
 
 std::vector<std::vector<float>> Image3DProjector::project3DImageTo2D(const std::vector<std::vector<float>>& image3d)
 {
-	auto t_projection = multiplyMatrix(m_projectionConfig.m_cameraIntrinsicMatrix, m_projectionConfig.m_cameraExtrinsicMatrix);	
 	std::vector<std::vector<float>> projectedPoints;
-
 	try
 	{
 		std::cout << "Projecting lidar data to camera plane" << std::endl;
 		for (auto sample : image3d)
 		{
-			auto cartesianPoint = CartesianLidarPoint{static_cast<uint16_t>(sample[2]), static_cast<uint8_t>(sample[0]), static_cast<uint8_t>(sample[1])};
+
+#ifdef VELODYNE_DATA
+			CartesianLidarPoint cartesianPoint;
+			cartesianPoint.xCoord = static_cast<uint16_t>(sample[0]);
+			cartesianPoint.yCoord = static_cast<uint8_t>(sample[1]);
+			cartesianPoint.zCoord = static_cast<uint8_t>(sample[2]);
+#else
+			auto cartesianPoint = CartesianLidarPoint{sample[2] / 100, sample[0], sample[1]};
 			std::cout << " SphericalPoint (" << sample[2] << "," << sample[0] << "," << sample[1] << ")" << std::endl;
 			std::cout << " cartesianPoint (" << cartesianPoint.xCoord << "," << cartesianPoint.yCoord << "," << cartesianPoint.zCoord << ")" << std::endl;
+#endif
+			const std::vector<std::vector<float>> sampleLidarPointHomo = {
+				{cartesianPoint.xCoord},
+				{cartesianPoint.yCoord},
+				{cartesianPoint.zCoord},
+				{1.0f}
+			};
+			auto sampleLidar2CamPoint = multiplyMatrix(m_projectionConfig.m_cameraExtrinsicMatrix, sampleLidarPointHomo);
 
-			//const std::vector<std::vector<float>> sampleLidarPoint{{{{sample[0]}}, {{sample[1]}}, {{sample[2]}}, {{1.0}} }};
-			const std::vector<std::vector<float>> sampleLidarPoint{{{{cartesianPoint.xCoord}}, {{cartesianPoint.yCoord}}, {{cartesianPoint.zCoord}}, {{1.0}} }};
+			std::vector<std::vector<float>> sampleLidar2CamPoint3x1{
+				{sampleLidar2CamPoint[0][0]},
+				{sampleLidar2CamPoint[1][0]},
+				{sampleLidar2CamPoint[2][0]}
+			};
+			std::cout << " sampleLidar2CamPoint3x1 (" << sampleLidar2CamPoint[0][0] << "," << sampleLidar2CamPoint[1][0] << "," << sampleLidar2CamPoint[2][0] << ")" << std::endl;
 
-			auto projectedPoint = multiplyMatrix(t_projection, sampleLidarPoint);
-			projectedPoints.push_back(std::vector<float>{projectedPoint[0][0] / projectedPoint[2][0], projectedPoint[1][0] / projectedPoint[2][0], projectedPoint[2][0]});
+			auto sampleLidar2ImagePoint = multiplyMatrix(m_projectionConfig.m_cameraIntrinsicMatrix, sampleLidar2CamPoint3x1);
+			std::cout << " sampleLidar2ImagePoint (" << sampleLidar2ImagePoint[0][0] << "," << sampleLidar2ImagePoint[1][0] << "," << sampleLidar2ImagePoint[2][0] << ")" << std::endl;
+			float u = sampleLidar2ImagePoint[0][0] / sampleLidar2ImagePoint[2][0];
+			float v = sampleLidar2ImagePoint[1][0] / sampleLidar2ImagePoint[2][0];
+			float z = sampleLidar2ImagePoint[2][0];
+			std::cout << "Projected point (u,v,z): " << u << "," << v  << "," << z << std::endl;
+			bool discardPoint = false;
+			if (u < 0 || u >= cameraResolutionWidth)
+			{
+				std::cout << "U Point out of bounds: (" << u << "," << v << "," << z << ")" << std::endl;
+				discardPoint = true;
+				//continue; // Skip points that are out of bounds
+			}
+			if (v < 0 || v >= cameraResolutionHeight)
+			{
+				std::cout << " V Point out of bounds: (" << u << "," << v << "," << z << ")" << std::endl;
+				discardPoint = true;
+				//continue; // Skip points that are out of bounds
+			}
+			if (z < 0)
+			{
+				std::cout << "Negative depth value: (" << u << "," << v << "," << z << ")" << std::endl;
+				discardPoint = true;
+				//continue; // Skip points with negative depth
+			}
+			if(!discardPoint)
+			{
+				std::cout << "Projected point (u,v,z): " << u << "," << v  << "," << z << std::endl;
+				projectedPoints.push_back(std::vector<float>{u, v,z});
+			}
+			else
+			{
+				std::cout << "Discarded point: (" << u << "," << v << "," << z << ")" << std::endl;
+			}
+			
+			
 		}
 	}
 	catch(const std::exception& e)

@@ -10,7 +10,7 @@ static const uint16_t IMAGE3D_SIZE = 2048;
 struct CartesianLidarPoint
 {
 	CartesianLidarPoint() = default;
-	CartesianLidarPoint(uint16_t distance, uint8_t angleH, uint8_t angleV);
+	CartesianLidarPoint(float distance, float angleH, float angleV);
 	bool operator==(const CartesianLidarPoint& other) const;
 
 	float xCoord;

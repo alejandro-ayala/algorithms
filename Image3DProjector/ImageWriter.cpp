@@ -39,7 +39,7 @@ Color ImageWriter::getColor(float distance, float maxDist) {
 void ImageWriter::createBMPImage(const std::vector<std::vector<float>>& points, float maxDistance) 
 {
     std::cout << "createBMPImage: " << m_filename << std::endl;
-    std::vector<Color> image(m_width * m_height, {0, 0, 0}); 
+    std::vector<Color> image(m_width * m_height, {255, 255, 255}); 
 
     for (const auto& point : points) {
         int x = static_cast<int>(point[0]);

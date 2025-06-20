@@ -1,12 +1,15 @@
 #include "CartesianLidarPoint.h"
 
 
-CartesianLidarPoint::CartesianLidarPoint(uint16_t distance, uint8_t angleH, uint8_t angleV)
+CartesianLidarPoint::CartesianLidarPoint(float distance, float angleH, float angleV)
 {
 
-    xCoord = distance * std::sin(angleV * PI / 180) * std::cos(angleH * PI / 180);
-    yCoord = distance * std::sin(angleV) * std::sin(angleH * PI / 180);
-    zCoord = distance * std::cos(angleV * PI / 180);
+    float theta = angleH * PI / 180.0f; // azimut
+    float phi   = angleV * PI / 180.0f; // elevación
+
+    xCoord = distance * std::cos(phi) * std::cos(theta); // frente
+    yCoord = distance * std::cos(phi) * std::sin(theta); // izquierda
+    zCoord = distance * std::sin(phi);                   // arriba
 }
 
 bool CartesianLidarPoint::operator==(const CartesianLidarPoint& other) const
