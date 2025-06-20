@@ -17,55 +17,49 @@
 #else
     uint16_t cameraResolutionWidth = 320, cameraResolutionHeight = 240;
 #endif
+void disableLogOutput()
+{
+    std::streambuf* original_cout_buffer = std::cout.rdbuf();
+    std::ofstream null_stream("/dev/null"); 
+    std::cout.rdbuf(null_stream.rdbuf());
+}
 int main()
 {
+    
+
 	std::cout << "Starting the program" << std::endl;
     float maxDistance = 0.0;
-#ifdef VELODYNE_DATA
-    const std::string inputFileName =  "D:\\Code\\algorithms\\Resources\\000007.bin";
-    //const std::string inputFileName =  "D:\\Code\\algorithms\\Resources\\0000000107.bin";
-    //const std::string inputFileName =  "D:\\Code\\algorithms\\Resources\\0000000001.bin";
-    
-	const auto lidarData = ImageReader().readLidarData(inputFileName, maxDistance);
+
+    const std::string fileFormat = ".bin";
+#ifdef VELODYNE_DATA  
+    disableLogOutput();
+    std::vector<std::string> inputFiles ={{"000007"},{"0000000107"},{"0000000001"}};
 #else
-	const auto lidarData = ImageReader().readLidarData();
+    std::vector<std::string> inputFiles ={{"LidarSample_1"}};
 #endif
-    std::cout << "Readed Lidar sample size: " << lidarData.size() << std::endl;
-    std::cout << "maxDistance: " << std::to_string(maxDistance) << std::endl;
-
-	auto image3dProjector = Image3DProjector();
-#define DIRECT_PROJECTION
-#ifdef DIRECT_PROJECTION
-    std::cout << "Direct projection mode" << std::endl;
-	const auto projectedPoints = image3dProjector.project3DImageTo2D(lidarData);
-	ImageWriter(cameraResolutionWidth, cameraResolutionHeight, "output.bmp").createBMPImage(projectedPoints, maxDistance);
-	std::cout << "createBMPImage done" << std::endl;	
-#else
-    std::cout << "Using project3DPointTo2D method" << std::endl;
-    
-	std::vector<std::vector<float>> projectedImg;
-    bool cartesianPoint = true;
-	for(const auto& point : lidarData)
-	{        
+    for(const auto& inputFileName : inputFiles)
+    {
 #ifdef VELODYNE_DATA
-
-            Coordinate3DPoint lidarPoint(point[0], point[1], point[2]);
-            const auto projectedPoint = image3dProjector.project3DPointTo2D(lidarPoint);
-            std::vector<float> projectedPointVector{projectedPoint.x, projectedPoint.y, projectedPoint.z};
-            projectedImg.push_back(projectedPointVector);
+        const std::string basePath = "Resources\\Lidar-Camera-Calibration\\Velodyne\\";
+        const std::string fullFilename = basePath + inputFileName + fileFormat;
+	    const auto lidarData = ImageReader().readLidarData(fullFilename, maxDistance);
 #else
-            auto cartesianLidarPoint = CartesianLidarPoint(point[2] / 100, point[0], point[1]);
-            Coordinate3DPoint lidarPoint(cartesianLidarPoint.xCoord, cartesianLidarPoint.yCoord, cartesianLidarPoint.zCoord); 
-            const auto projectedPoint = image3dProjector.project3DPointTo2D(lidarPoint);
-            std::vector<float> projectedPointVector{projectedPoint.x, projectedPoint.y, projectedPoint.z};
-            projectedImg.push_back(projectedPointVector);
- #endif
-
-	}
-    ImageWriter(cameraResolutionWidth, cameraResolutionHeight, "output3d.bmp").createBMPImage(projectedImg, maxDistance);
+        const std::string basePath = "Resources\\Lidar-Camera-Calibration\\Velodyne\\";
+        const std::string fileFormat = ".txt";        
+        const std::string fullFilename = basePath + inputFileName + fileFormat;
+	    const auto lidarData = ImageReader().readLidarDataFromTxtFile(fullFilename);
 #endif
+        std::cout << "Readed Lidar sample size: " << lidarData.size() << std::endl;
+        std::cout << "maxDistance: " << std::to_string(maxDistance) << std::endl;
+
+        auto image3dProjector = Image3DProjector();
+        std::vector<std::vector<float>> projectedImg = image3dProjector.project3DImageTo2D(lidarData);
+        
+        std::string outputFilename = basePath + inputFileName + "_projected" + ".bmp";
+        ImageWriter(cameraResolutionWidth, cameraResolutionHeight, outputFilename).createBMPImage(projectedImg, maxDistance);
+    }
     
-    return 0;
+    //return 0;
 }
 
 #else
