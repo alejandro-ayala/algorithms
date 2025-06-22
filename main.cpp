@@ -35,7 +35,15 @@ int main()
     disableLogOutput();
     std::vector<std::string> inputFiles ={{"000007"},{"0000000107"},{"0000000001"}};
 #else
-    std::vector<std::string> inputFiles ={{"LidarSample_1"}};
+    std::vector<std::string> inputFiles;
+    uint8_t lidarSamples = 16;
+/*    for(int i = 1; i <= lidarSamples; i++)
+    {
+        //std::string fileName = "LidarSample_" + std::to_string(i);
+        inputFiles.push_back(fileName);
+    }
+        */
+       inputFiles.push_back("LidarSample_Fake");
 #endif
     for(const auto& inputFileName : inputFiles)
     {
@@ -47,7 +55,7 @@ int main()
         const std::string basePath = "Resources\\Lidar-Camera-Calibration\\Velodyne\\";
         const std::string fileFormat = ".txt";        
         const std::string fullFilename = basePath + inputFileName + fileFormat;
-	    const auto lidarData = ImageReader().readLidarDataFromTxtFile(fullFilename);
+	    const auto lidarData = ImageReader().readLidarDataFromTxtFile(fullFilename, maxDistance);
 #endif
         std::cout << "Readed Lidar sample size: " << lidarData.size() << std::endl;
         std::cout << "maxDistance: " << std::to_string(maxDistance) << std::endl;

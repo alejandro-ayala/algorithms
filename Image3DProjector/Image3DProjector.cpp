@@ -61,7 +61,7 @@ std::vector<std::vector<float>> Image3DProjector::project3DImageTo2D(const std::
             std::vector<float> projectedPointVector{projectedPoint.x, projectedPoint.y, projectedPoint.z};
             projectedImg.push_back(projectedPointVector);
 #else
-            auto cartesianLidarPoint = CartesianLidarPoint(point[2] / 100, point[0], point[1]);
+            auto cartesianLidarPoint = CartesianLidarPoint(point[2], point[0], point[1]);
             Coordinate3DPoint lidarPoint(cartesianLidarPoint.xCoord, cartesianLidarPoint.yCoord, cartesianLidarPoint.zCoord); 
             const auto projectedPoint = project3DPointTo2D(lidarPoint);
             std::vector<float> projectedPointVector{projectedPoint.x, projectedPoint.y, projectedPoint.z};

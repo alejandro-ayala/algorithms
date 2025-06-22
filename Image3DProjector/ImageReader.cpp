@@ -7,13 +7,13 @@
 #include <iomanip>
 
 
-std::vector<std::vector<float>> ImageReader::readLidarDataFromTxtFile(const std::string& fileName)
+std::vector<std::vector<float>> ImageReader::readLidarDataFromTxtFile(const std::string& fileName, float& maxDist)
 {
 
     std::ifstream file(fileName);
 	std::vector<std::vector<float>> lidarData;
     std::string line;
-
+    maxDist = std::numeric_limits<float>::lowest();
     if (file.is_open()) {
         while (std::getline(file, line)) {
 
@@ -25,6 +25,11 @@ std::vector<std::vector<float>> ImageReader::readLidarDataFromTxtFile(const std:
 				float num = std::stof(s);
 				v.push_back(num);
 			}
+            const auto dist = v.at(2);
+            if (dist > maxDist) 
+            {
+                maxDist = dist;
+            } 
 			lidarData.push_back(v);		
         }
         file.close();
