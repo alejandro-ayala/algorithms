@@ -64,6 +64,18 @@ std::vector<std::vector<float>> Image3DProjector::project3DImageTo2D(const std::
             auto cartesianLidarPoint = CartesianLidarPoint(point[2], point[0], point[1]);
             Coordinate3DPoint lidarPoint(cartesianLidarPoint.xCoord, cartesianLidarPoint.yCoord, cartesianLidarPoint.zCoord); 
             const auto projectedPoint = project3DPointTo2D(lidarPoint);
+			if (projectedPoint.z <= 0.0f) 
+			{
+				std::cout << "Projected point has non-positive z value, skipping: " << projectedPoint << std::endl;
+				continue; // Skip points with non-positive z value
+			}
+			if(projectedPoint.x < 0.0f || projectedPoint.x >= 320 ||
+			   projectedPoint.y < 0.0f || projectedPoint.y >= 240)
+			{
+				std::cout << "Projected point is out of bounds, skipping: " << projectedPoint << std::endl;
+				continue; // Skip points that are out of bounds
+			}
+			std::cout << "Original point(angleH, angleV, distancia): " << point[0] << ", " << point[1] << ", " << point[2] << " -- Projected point (x, y, distancia): " << projectedPoint << std::endl;
             std::vector<float> projectedPointVector{projectedPoint.x, projectedPoint.y, projectedPoint.z};
             projectedImg.push_back(projectedPointVector);
  #endif
