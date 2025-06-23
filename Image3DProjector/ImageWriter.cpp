@@ -1,6 +1,8 @@
 #include "ImageWriter.h"
 #include <cmath>
 #include <algorithm>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "../stb/stb_image_write.h"
 
 ImageWriter::ImageWriter(uint16_t width, uint16_t height, const std::string& fileName) : m_width(width), m_height(height), m_filename(fileName)
 {}
@@ -35,6 +37,10 @@ Color ImageWriter::getColor(float distance, float maxDist) {
     };
 }
 
+void ImageWriter::saveImageRGB(const std::string& filename, const std::vector<uint8_t>& rgb, int width, int height) 
+{
+    stbi_write_png(filename.c_str(), width, height, 3, rgb.data(), width * 3);
+}
 
 void ImageWriter::createBMPImage(const std::vector<std::vector<float>>& points, float maxDistance) 
 {

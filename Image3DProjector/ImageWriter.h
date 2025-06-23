@@ -24,6 +24,10 @@ private:
 
 public:
     ImageWriter(uint16_t width, uint16_t height, const std::string& fileName);
+    ImageWriter() = default;
     ~ImageWriter() = default;
     void createBMPImage(const std::vector<std::vector<float>>& points, float maxDistance);
+
+    void saveImageRGB(const std::string& filename, const std::vector<uint8_t>& rgb, int width, int height);
+
 };

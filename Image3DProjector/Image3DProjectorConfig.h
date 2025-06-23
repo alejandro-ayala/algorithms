@@ -20,7 +20,7 @@ struct Image3DProjectorConfig
 	const std::vector<std::vector<float>> m_cameraExtrinsicMatrix{
     {0.0f, -1.0f,  0.0f, 0.0f},  // X_cam = -Y_lidar
     {0.0f,  0.0f, -1.0f, 0.0f},  // Y_cam = -Z_lidar
-    {1.0f,  0.0f,  0.0f, 0.0f},  // Z_cam =  X_lidar
+    {1.0f,  0.0f,  0.0f, 0.0f},  // Z_cam =  X_lidar + 15 cm translation
     {0.0f,  0.0f,  0.0f, 1.0f}
 };
 #else
