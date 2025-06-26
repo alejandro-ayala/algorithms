@@ -1,6 +1,7 @@
 #pragma once 
 #include "Image3DProjectorConfig.h"
 #include "Coordinate3DPoint.h"
+#include "Coordinate2DPoint.h"
 #include "CartesianLidarPoint.h"
 
 class Image3DProjector
@@ -16,5 +17,7 @@ public:
 	Image3DProjector(const Image3DProjectorConfig& config = Image3DProjectorConfig()) : m_projectionConfig(config) {};
 	~Image3DProjector() = default;
 	Coordinate3DPoint project3DPointTo2D(const Coordinate3DPoint& lidarPoint);
+	Coordinate2DPoint distortPoint(float x, float y);
+	Coordinate3DPoint project3DPointTo2DWithDistorsion(const Coordinate3DPoint& lidarPoint);
 	std::vector<std::vector<float>> multiplyMatrix(const std::vector<std::vector<float>>& a, const std::vector<std::vector<float>>& b) const;
 };

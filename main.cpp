@@ -133,7 +133,7 @@ int main()
        //inputFiles.push_back("lidar15");
 */
     //std::vector<std::string> inputFiles ={{"lidar2"},{"lidar3"},{"lidar5"},{"lidar6"},{"lidar7"},{"lidar8"},{"lidar9"},{"lidar11"},{"lidar12"},{"lidar13"},{"lidar14"},{"lidar15"}};
-    std::vector<std::string> inputFiles ={{"jarronCerca"},{"jarronMedio"}, {"jarronLejos"}};
+    std::vector<std::string> inputFiles ={{"calibrateFile"}};
 #endif
     for(const auto& inputFileName : inputFiles)
     {
